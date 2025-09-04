@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Certificate Download</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/realmecampus.in.jpg">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background: #fff;
+      border: 2px solid #FFD600;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h2 {
+      color: #000;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+    input {
+      padding: 12px;
+      width: 90%;
+      border: 2px solid #FFD600;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #FFD600;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 95%;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #e6c200;
+    }
+    .whatsapp-btn {
+      background-color: #25D366;
+      color: white;
+    }
+    .whatsapp-btn:hover {
+      background-color: #1ebe5a;
+    }
+    .logo {
+      margin-bottom: 20px;
+    }
+    .logo img {
+      width: 150px;
+      max-width: 80%;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      font-weight: bold;
+      z-index: 1000;
+      animation: fadein 0.3s;
+      color: #000;
+    }
+    .popup.success { background: #FFD600; }
+    .popup.error { background: #ff4d4d; color: #fff; }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @media (max-width: 480px) {
+      h2 { font-size: 1.2rem; }
+      input, button { font-size: 14px; padding: 10px; }
+      .container { padding: 20px 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="popup success" id="popup-success">✅ Certificate found! Opening...</div>
+  <div class="popup error" id="popup-error">❌ Email not found. Please try again.</div>
+
+  <div class="container">
+    <div class="logo">
+      <img src="/realmecampus.in.jpg" alt="Logo">
+    </div>
+    <h2>Certificate Download</h2>
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <br>
+    <button onclick="getCertificate()">Download</button>
+    <button class="whatsapp-btn" onclick="requestOnWhatsApp()">Request via WhatsApp</button>
+  </div>
+
+  <script>
+    async function getCertificate() {
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const res = await fetch("emails.json");
+      const data = await res.json();
+
+      if (data[email]) {
+        showPopup("success");
+        setTimeout(() => {
+          window.open(data[email], "_blank");
+        }, 1500);
+      } else {
+        showPopup("error");
+      }
+    }
+
+    function requestOnWhatsApp() {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        alert("Please enter your email first.");
+        return;
+      }
+      const phoneNumber = "917702135113"; // ✅ Replace with YOUR WhatsApp number (with country code, no +)
+      const message = `Hi, Please send the realme certificate on my email : ${email}`;
+      const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    }
+
+    function showPopup(type) {
+      const popup = document.getElementById("popup-" + type);
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
