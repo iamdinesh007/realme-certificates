@@ -90,7 +90,6 @@
       to { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
 
-    /* Mobile tweaks */
     @media (max-width: 480px) {
       h2 { font-size: 1.2rem; }
       input, button { font-size: 14px; padding: 10px; }
@@ -112,13 +111,25 @@
     <input type="email" id="email" placeholder="Enter your email" required>
     <br>
     <button onclick="getCertificate()">Download</button>
-    <button class="whatsapp-btn" onclick="requestViaWhatsApp()">Request via WhatsApp</button>
+    <button class="whatsapp-btn" onclick="requestViaWhatsApp()">Request via Email</button>
   </div>
 
   <script>
+    // Email validation function
+    function isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
     // Download certificate
     async function getCertificate() {
       const email = document.getElementById("email").value.trim().toLowerCase();
+
+      if (!isValidEmail(email)) {
+        showPopup("error", "❌ Please enter a valid email address.");
+        return;
+      }
+
       const res = await fetch("emails.json");
       const data = await res.json();
 
@@ -135,8 +146,9 @@
     // Request via WhatsApp (only for registered users)
     async function requestViaWhatsApp() {
       const emailInput = document.getElementById("email").value.trim().toLowerCase();
-      if (!emailInput) {
-        alert("Please enter your email first.");
+
+      if (!isValidEmail(emailInput)) {
+        showPopup("error", "❌ Please enter a valid email address.");
         return;
       }
 
@@ -144,13 +156,12 @@
       const data = await res.json();
 
       if (!data[emailInput]) {
-        // Email not registered → show popup
         showPopup("error", "❌ Please use a registered email id.");
         return;
       }
 
-      // Registered email → redirect to WhatsApp with pre-filled message
-      const phoneNumber = "917702135113"; // your WhatsApp number with country code
+      // Registered email → redirect to WhatsApp
+      const phoneNumber = "917702135113"; // your WhatsApp number
       const message = `Hi, Please send the realme certificate on my email: ${emailInput}`;
       const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank");
