@@ -6,8 +6,7 @@
   <link rel="icon" type="image/png" href="realmecampus.in.jpg">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fff;
+      font-family: Calibri, Arial, sans-serif;
       color: #000;
       display: flex;
       justify-content: center;
@@ -15,7 +14,10 @@
       min-height: 100vh;
       margin: 0;
       padding: 20px;
+      background: linear-gradient(270deg, #fff, #FFD600, #fff, #FFD600);
+      background-size: 400% 400%;
     }
+
     .container {
       background: #fff;
       border: 2px solid #FFD600;
@@ -26,11 +28,8 @@
       max-width: 400px;
       text-align: center;
     }
-    h2 {
-      color: #000;
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-    }
+
+    h2 { color: #000; margin-bottom: 20px; font-size: 1.5rem; }
     input {
       padding: 12px;
       width: 90%;
@@ -53,19 +52,11 @@
     }
     button:hover { background-color: #e6c200; }
 
-    .whatsapp-btn {
-      background-color: #25D366;
-      color: white;
-    }
+    .whatsapp-btn { background-color: #25D366; color: white; }
     .whatsapp-btn:hover { background-color: #1ebe5a; }
 
-    .logo {
-      margin-bottom: 20px;
-    }
-    .logo img {
-      width: 150px;
-      max-width: 80%;
-    }
+    .logo { margin-bottom: 20px; }
+    .logo img { width: 150px; max-width: 80%; }
 
     .popup {
       display: none;
@@ -78,16 +69,10 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       font-weight: bold;
       z-index: 1000;
-      animation: fadein 0.3s;
       color: #000;
     }
     .popup.success { background: #FFD600; }
     .popup.error { background: #ff4d4d; color: #fff; }
-
-    @keyframes fadein {
-      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
 
     @media (max-width: 480px) {
       h2 { font-size: 1.2rem; }
@@ -98,13 +83,11 @@
 </head>
 <body>
 
-  <div class="popup success" id="popup-success">✅ Certificate found! Opening...</div>
-  <div class="popup error" id="popup-error">❌ Email not found. Please try again.</div>
+  <div class="popup success" id="popup-success"></div>
+  <div class="popup error" id="popup-error"></div>
 
   <div class="container">
-    <div class="logo">
-      <img src="realmecampus.in.jpg" alt="Logo">
-    </div>
+    <div class="logo"><img src="realmecampus.in.jpg" alt="Logo"></div>
     <h2>Certificate Download</h2>
     <input type="email" id="email" placeholder="Enter your email" required>
     <br>
@@ -113,21 +96,17 @@
   </div>
 
   <script>
-    // Email validation
     function isValidEmail(email) {
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return re.test(email);
     }
 
-    // Detect iOS
     function isIOS() {
       return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     }
 
-    // Download certificate
     async function getCertificate() {
       const email = document.getElementById("email").value.trim().toLowerCase();
-
       if (!isValidEmail(email)) {
         showPopup("error", "❌ Please enter a valid email address.");
         return;
@@ -137,24 +116,24 @@
       const data = await res.json();
 
       if (data[email]) {
-        showPopup("success", "✅ Certificate found! Opening...");
-
-        if (isIOS()) {
-          // iOS Safari → open in same tab
-          window.location.href = data[email];
+        showPopup("success", "✅ Certificate found! Downloading...");
+        if (!isIOS()) {
+          const link = document.createElement("a");
+          link.href = data[email];
+          link.download = data[email].split("/").pop() || "certificate.pdf";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         } else {
-          // Desktop → open in new tab
-          window.open(data[email], "_blank");
+          window.location.href = data[email];
         }
       } else {
         showPopup("error", "❌ Email not found. Please try again.");
       }
     }
 
-    // Request via WhatsApp (only for registered emails)
     async function requestViaWhatsApp() {
       const emailInput = document.getElementById("email").value.trim().toLowerCase();
-
       if (!isValidEmail(emailInput)) {
         showPopup("error", "❌ Please enter a valid email address.");
         return;
@@ -169,20 +148,30 @@
       }
 
       const phoneNumber = "917702135113";
-      const message = `Hi, Please send the realme certificate on my email: ${emailInput}`;
+      const message = `Hi, Please send the certificate on my email: ${emailInput}`;
       const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank");
     }
 
-    // Popup function
     function showPopup(type, message) {
       const popup = document.getElementById("popup-" + type);
       popup.textContent = message;
       popup.style.display = "block";
-      setTimeout(() => {
-        popup.style.display = "none";
-      }, 2500);
+      setTimeout(() => { popup.style.display = "none"; }, 2500);
     }
+
+    // Smooth continuous background animation
+    const body = document.body;
+    const duration = 30000; // 30s smooth loop
+
+    function animateBG() {
+      const elapsed = Date.now() % duration;
+      const percent = (elapsed / duration) * 100;
+      body.style.backgroundPosition = `${percent}% 50%`;
+      requestAnimationFrame(animateBG);
+    }
+
+    animateBG();
   </script>
 </body>
 </html>
