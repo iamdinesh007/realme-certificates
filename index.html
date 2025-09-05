@@ -67,7 +67,6 @@
       max-width: 80%;
     }
 
-    /* Popup modal */
     .popup {
       display: none;
       position: fixed;
@@ -99,7 +98,6 @@
 </head>
 <body>
 
-  <!-- Success & Error popups -->
   <div class="popup success" id="popup-success">✅ Certificate found! Opening...</div>
   <div class="popup error" id="popup-error">❌ Email not found. Please try again.</div>
 
@@ -115,10 +113,15 @@
   </div>
 
   <script>
-    // Email validation function
+    // Email validation
     function isValidEmail(email) {
       const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return re.test(email);
+    }
+
+    // Detect iOS
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     }
 
     // Download certificate
@@ -135,15 +138,20 @@
 
       if (data[email]) {
         showPopup("success", "✅ Certificate found! Opening...");
-        setTimeout(() => {
+
+        if (isIOS()) {
+          // iOS Safari → open in same tab
+          window.location.href = data[email];
+        } else {
+          // Desktop → open in new tab
           window.open(data[email], "_blank");
-        }, 1500);
+        }
       } else {
         showPopup("error", "❌ Email not found. Please try again.");
       }
     }
 
-    // Request via WhatsApp (only for registered users)
+    // Request via WhatsApp (only for registered emails)
     async function requestViaWhatsApp() {
       const emailInput = document.getElementById("email").value.trim().toLowerCase();
 
@@ -160,8 +168,7 @@
         return;
       }
 
-      // Registered email → redirect to WhatsApp
-      const phoneNumber = "917702135113"; // your WhatsApp number
+      const phoneNumber = "917702135113";
       const message = `Hi, Please send the realme certificate on my email: ${emailInput}`;
       const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank");
